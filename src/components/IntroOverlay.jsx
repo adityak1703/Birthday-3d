@@ -80,7 +80,7 @@ function IntroOverlay({ isVisible, onSkip }) {
                 fontFamily: 'Georgia, serif'
               }}
             >
-              {birthdayMessage}
+              /* {birthdayMessage} */
             </motion.p>
           </motion.div>
 
