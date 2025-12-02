@@ -206,5 +206,4 @@ function Cake({ position = [0, 0, 0], onCandlesBlown }) {
   )
 }
 
-export { Cake, Candle }
 export default Cake

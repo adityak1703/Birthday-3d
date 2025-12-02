@@ -3,9 +3,9 @@ import { useFrame } from '@react-three/fiber'
 import { Stars, Float } from '@react-three/drei'
 import * as THREE from 'three'
 
-// Seeded random for consistent confetti generation
+// Seeded random for consistent confetti generation with better distribution
 function seededRandom(seed) {
-  const x = Math.sin(seed) * 10000
+  const x = Math.sin(seed * 12.9898) * 43758.5453
   return x - Math.floor(x)
 }
 
