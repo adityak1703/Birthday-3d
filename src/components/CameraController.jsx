@@ -6,28 +6,28 @@ import * as THREE from 'three'
 // Animation keyframes defined outside component
 const KEYFRAMES = {
   start: {
-    position: new THREE.Vector3(0, 8, 12),
+    position: new THREE.Vector3(-3, 3, 4),
     lookAt: new THREE.Vector3(0, 0, 0),
     duration: 0
   },
   phase1: {
-    position: new THREE.Vector3(8, 5, 8),
-    lookAt: new THREE.Vector3(0, 1, 0),
+    position: new THREE.Vector3(3, 2.5, 3),
+    lookAt: new THREE.Vector3(0, 0.5, 0),
     duration: 2500
   },
   phase2: {
-    position: new THREE.Vector3(-5, 3, 6),
-    lookAt: new THREE.Vector3(0, 1, 0),
+    position: new THREE.Vector3(-2, 2, 3.5),
+    lookAt: new THREE.Vector3(0, 0.5, 0),
     duration: 2500
   },
   phase3: {
-    position: new THREE.Vector3(0, 2, 5),
-    lookAt: new THREE.Vector3(0, 0.5, 0),
+    position: new THREE.Vector3(0, 1.5, 4),
+    lookAt: new THREE.Vector3(0, 0.3, 0),
     duration: 2000
   },
   complete: {
-    position: new THREE.Vector3(0, 2, 5),
-    lookAt: new THREE.Vector3(0, 0.5, 0),
+    position: new THREE.Vector3(0, 1.5, 4),
+    lookAt: new THREE.Vector3(0, 0.3, 0),
     duration: 0
   }
 }
@@ -116,13 +116,16 @@ function CameraController({ introComplete, onIntroComplete }) {
           enablePan={false}
           enableZoom={true}
           enableRotate={true}
-          minDistance={3}
-          maxDistance={12}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 2.2}
-          target={[0, 0.5, 0]}
+          minDistance={2}
+          maxDistance={8}
+          minPolarAngle={Math.PI / 4}
+          maxPolarAngle={Math.PI / 2.1}
+          minAzimuthAngle={-Math.PI / 3}  // Restrict left rotation (60 degrees)
+          maxAzimuthAngle={Math.PI / 3}   // Restrict right rotation (60 degrees)
+          target={[0, 0.3, 0]}
           dampingFactor={0.05}
           rotateSpeed={0.5}
+          enableDamping={true}
         />
       )}
     </>

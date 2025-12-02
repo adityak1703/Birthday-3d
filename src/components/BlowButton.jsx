@@ -37,8 +37,10 @@ function BlowButton({ onBlow, disabled = false, candlesExtinguished = false }) {
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: 100,
-              textAlign: 'center'
+              textAlign: 'center',
+              pointerEvents: 'auto'
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             <motion.p
               style={{
@@ -123,7 +125,7 @@ function BlowButton({ onBlow, disabled = false, candlesExtinguished = false }) {
               transform: 'translate(-50%, -50%)',
               zIndex: 200,
               textAlign: 'center',
-              pointerEvents: 'none'
+              pointerEvents: 'auto'
             }}
           >
             <motion.div
@@ -137,9 +139,48 @@ function BlowButton({ onBlow, disabled = false, candlesExtinguished = false }) {
                 borderRadius: '30px',
                 padding: '50px',
                 boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-                border: '3px solid rgba(255,215,0,0.5)'
+                border: '3px solid rgba(255,215,0,0.5)',
+                position: 'relative'
               }}
             >
+              {/* Close button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowWish(false)
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '15px',
+                  right: '15px',
+                  background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(255, 107, 107, 0.4)',
+                  transition: 'all 0.2s',
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  zIndex: 10
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.15) rotate(90deg)'
+                  e.target.style.boxShadow = '0 6px 16px rgba(255, 107, 107, 0.6)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1) rotate(0deg)'
+                  e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)'
+                }}
+              >
+                ×
+              </button>
+              
               <motion.div
                 animate={{ 
                   y: [0, -10, 0],

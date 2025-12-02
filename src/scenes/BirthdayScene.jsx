@@ -1,6 +1,7 @@
 import { Suspense, useState, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Loader } from '@react-three/drei'
+import * as THREE from 'three'
 
 import Cake from '../components/Cake'
 import HangingPhotos from '../components/HangingPhotos'
@@ -8,6 +9,8 @@ import Environment from '../components/Environment'
 import CameraController from '../components/CameraController'
 import BlowButton from '../components/BlowButton'
 import IntroOverlay from '../components/IntroOverlay'
+import LetterZoom from '../components/LetterZoom'
+import LightToggle from '../components/LightToggle'
 
 function LoadingScreen() {
   return (
@@ -22,6 +25,8 @@ function BirthdayScene() {
   const [introComplete, setIntroComplete] = useState(false)
   const [candlesBlown, setCandlesBlown] = useState(false)
   const [showIntroOverlay, setShowIntroOverlay] = useState(true)
+  const [showLetterZoom, setShowLetterZoom] = useState(false)
+  const [isLitUp, setIsLitUp] = useState(false)
   const cakeRef = useRef()
 
   const handleIntroComplete = () => {
@@ -39,12 +44,21 @@ function BirthdayScene() {
     setCandlesBlown(true)
   }
 
+  const handleLetterClick = (e) => {
+    e.stopPropagation()
+    setShowLetterZoom(true)
+  }
+
+  const handleCloseLetterZoom = () => {
+    setShowLetterZoom(false)
+  }
+
   return (
     <div style={{ 
       width: '100vw', 
       height: '100vh', 
       position: 'relative',
-      background: '#0a0a15'
+      background: '#0a0a0a'
     }}>
       {/* Intro overlay */}
       <IntroOverlay 
@@ -56,17 +70,19 @@ function BirthdayScene() {
       <Canvas
         shadows
         camera={{ 
-          fov: 60, 
+          fov: 50, 
           near: 0.1, 
-          far: 100,
-          position: [0, 8, 12]
+          far: 50,
+          position: [-3, 3, 4]
         }}
         gl={{
           antialias: true,
           alpha: false,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 0.8
         }}
-        style={{ position: 'absolute', top: 0, left: 0 }}
+        style={{ position: 'absolute', top: 0, left: 0, background: '#0a0a0a' }}
       >
         <Suspense fallback={<LoadingScreen />}>
           {/* Camera animation controller */}
@@ -75,14 +91,24 @@ function BirthdayScene() {
             onIntroComplete={handleIntroComplete}
           />
           
-          {/* Environment (lights, balloons, floor, etc.) */}
-          <Environment showConfetti={candlesBlown} />
+          {/* Environment (lights, room, table, gifts, letter) */}
+          <Environment 
+            showConfetti={candlesBlown} 
+            onLetterClick={handleLetterClick}
+            isLitUp={isLitUp}
+          />
           
           {/* Cake with candles */}
           <Cake 
             ref={cakeRef}
             position={[0, 0, 0]} 
             onCandlesBlown={() => setCandlesBlown(true)}
+          />
+          
+          {/* Letter zoom view */}
+          <LetterZoom 
+            isVisible={showLetterZoom}
+            onClose={handleCloseLetterZoom}
           />
           
           {/* Hanging photo gallery */}
@@ -92,6 +118,9 @@ function BirthdayScene() {
 
       {/* Loader indicator from drei */}
       <Loader />
+
+      {/* Light toggle button */}
+      <LightToggle onToggle={setIsLitUp} />
 
       {/* Blow button UI */}
       {introComplete && (

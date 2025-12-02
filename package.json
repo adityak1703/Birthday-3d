@@ -1,8 +1,30 @@
 {
-  "name": "birthday3d",
-  "private": true,
-  "version": "0.0.0",
+  "name": "birthday-3d-wish",
+  "private": false,
+  "version": "1.0.0",
+  "description": "A cinematic 3D birthday wish website built with React and Three.js - fully customizable and open source",
   "type": "module",
+  "keywords": [
+    "birthday",
+    "3d",
+    "threejs",
+    "react",
+    "interactive",
+    "animation",
+    "celebration",
+    "webgl",
+    "vite"
+  ],
+  "author": "ak-1344",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ak-1344/Birthday-3d.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ak-1344/Birthday-3d/issues"
+  },
+  "homepage": "https://github.com/ak-1344/Birthday-3d#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

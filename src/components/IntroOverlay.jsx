@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
 
 function IntroOverlay({ isVisible, onSkip }) {
+  const personName = import.meta.env.VITE_PERSON_NAME || 'Friend'
+  const birthdayMessage = import.meta.env.VITE_BIRTHDAY_MESSAGE || 'Welcome to your special day!'
+  
   return (
     <AnimatePresence>
       {isVisible && (
@@ -63,7 +66,7 @@ function IntroOverlay({ isVisible, onSkip }) {
               }}
               transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
             >
-              ✨ Happy Birthday ✨
+              ✨ Happy Birthday {personName} ✨
             </motion.h1>
 
             <motion.p
@@ -77,7 +80,7 @@ function IntroOverlay({ isVisible, onSkip }) {
                 fontFamily: 'Georgia, serif'
               }}
             >
-              Welcome to your special day!
+              {birthdayMessage}
             </motion.p>
           </motion.div>
 

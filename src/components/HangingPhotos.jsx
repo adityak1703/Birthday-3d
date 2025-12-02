@@ -1,21 +1,33 @@
-import { useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useRef, useState, useEffect } from 'react'
+import { useFrame, useLoader } from '@react-three/fiber'
 import { Html, Text } from '@react-three/drei'
+import * as THREE from 'three'
 
-function Photo({ position, rotation = [0, 0, 0], caption, index, onZoom, isZoomed }) {
+function Photo({ position, rotation = [0, 0, 0], caption, index, onZoom, isZoomed, imageUrl }) {
   const groupRef = useRef()
   const frameRef = useRef()
   const [hovered, setHovered] = useState(false)
+  const [texture, setTexture] = useState(null)
+  const [textureError, setTextureError] = useState(false)
   
-  // Gentle swinging animation
-  useFrame((state) => {
-    if (groupRef.current && !isZoomed) {
-      const time = state.clock.getElapsedTime()
-      const swingAmount = 0.05
-      const swingSpeed = 0.5 + index * 0.1
-      groupRef.current.rotation.z = Math.sin(time * swingSpeed) * swingAmount
+  // Load texture properly with useEffect
+  useEffect(() => {
+    if (imageUrl) {
+      const loader = new THREE.TextureLoader()
+      loader.load(
+        imageUrl,
+        (loadedTexture) => {
+          loadedTexture.colorSpace = THREE.SRGBColorSpace
+          setTexture(loadedTexture)
+        },
+        undefined,
+        (error) => {
+          console.warn(`Failed to load image: ${imageUrl}`, error)
+          setTextureError(true)
+        }
+      )
     }
-  })
+  }, [imageUrl])
 
   const handleClick = (e) => {
     e.stopPropagation()
@@ -30,12 +42,6 @@ function Photo({ position, rotation = [0, 0, 0], caption, index, onZoom, isZoome
 
   return (
     <group ref={groupRef} position={position} rotation={rotation}>
-      {/* String */}
-      <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.005, 0.005, 0.8, 8]} />
-        <meshStandardMaterial color="#8B4513" />
-      </mesh>
-      
       {/* Photo frame */}
       <group
         ref={frameRef}
@@ -43,18 +49,18 @@ function Photo({ position, rotation = [0, 0, 0], caption, index, onZoom, isZoome
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        {/* Outer frame (wood) */}
+        {/* Outer frame (wood) - larger */}
         <mesh position={[0, 0, -0.02]}>
-          <boxGeometry args={[0.7, 0.55, 0.04]} />
+          <boxGeometry args={[0.9, 0.7, 0.04]} />
           <meshStandardMaterial 
             color={hovered ? '#d4a574' : '#8B4513'} 
             roughness={0.6}
           />
         </mesh>
         
-        {/* Inner frame border (gold) */}
+        {/* Inner frame border (gold) - larger */}
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[0.6, 0.45, 0.02]} />
+          <boxGeometry args={[0.78, 0.58, 0.02]} />
           <meshStandardMaterial 
             color="#ffd700" 
             metalness={0.8}
@@ -62,17 +68,23 @@ function Photo({ position, rotation = [0, 0, 0], caption, index, onZoom, isZoome
           />
         </mesh>
         
-        {/* Photo placeholder */}
+        {/* Photo placeholder or actual image - larger for clarity */}
         <mesh position={[0, 0, 0.01]}>
-          <planeGeometry args={[0.5, 0.35]} />
-          <meshBasicMaterial color={photoColor} />
+          <planeGeometry args={[0.7, 0.5]} />
+          {texture ? (
+            <meshStandardMaterial map={texture} />
+          ) : (
+            <meshStandardMaterial color={photoColor} emissive={photoColor} emissiveIntensity={0.3} />
+          )}
         </mesh>
         
-        {/* Photo texture pattern (decorative) */}
-        <mesh position={[0, 0, 0.015]}>
-          <planeGeometry args={[0.4, 0.25]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
-        </mesh>
+        {/* Photo texture pattern (decorative) - only show if no texture */}
+        {!texture && (
+          <mesh position={[0, 0, 0.015]}>
+            <planeGeometry args={[0.55, 0.38]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
+          </mesh>
+        )}
         
         {/* Caption */}
         <Text
@@ -124,7 +136,9 @@ function ZoomedPhoto({ photo, onClose }) {
           style={{
             width: '100%',
             height: '300px',
-            background: `linear-gradient(45deg, ${photo.color}, ${photo.colorAlt})`,
+            background: photo.imageUrl 
+              ? `url(${photo.imageUrl}) center/cover` 
+              : `linear-gradient(45deg, ${photo.color}, ${photo.colorAlt})`,
             borderRadius: '12px',
             marginBottom: '20px',
             display: 'flex',
@@ -133,7 +147,7 @@ function ZoomedPhoto({ photo, onClose }) {
             fontSize: '60px'
           }}
         >
-          📷
+          {!photo.imageUrl && '📷'}
         </div>
         <h2 style={{ 
           marginBottom: '15px', 
@@ -183,51 +197,148 @@ function ZoomedPhoto({ photo, onClose }) {
 
 function HangingPhotos({ photos = [] }) {
   const [zoomedIndex, setZoomedIndex] = useState(null)
+  
+  // Get total photo count from env
+  const totalPhotoCount = parseInt(import.meta.env.VITE_PHOTO_COUNT) || 5
+  
+  // Generate photo data with dynamic image loading
+  const generatePhotoData = () => {
+    // Back wall positions (max 5 photos) - Zigzag pattern: down-up-down-up-down
+    const backWallPositions = [
+      { pos: [-2.8, 2.3, -8.9], rot: [0, 0, 0] },        // Position 1: Down
+      { pos: [-1.4, 3.0, -8.9], rot: [0, 0, 0] },        // Position 2: Up
+      { pos: [0, 2.3, -8.9], rot: [0, 0, 0] },           // Position 3: Down
+      { pos: [1.4, 3.0, -8.9], rot: [0, 0, 0] },         // Position 4: Up
+      { pos: [2.8, 2.3, -8.9], rot: [0, 0, 0] }          // Position 5: Down
+    ]
+    
+    // Left wall positions (for photos 6+)
+    const leftWallPositions = [
+      { pos: [-5.9, 2.5, -3], rot: [0, Math.PI / 2, 0] },     // Left wall position 1
+      { pos: [-5.9, 2.5, -0.5], rot: [0, Math.PI / 2, 0] },   // Left wall position 2
+      { pos: [-5.9, 2.5, 2], rot: [0, Math.PI / 2, 0] }       // Left wall position 3
+    ]
+    
+    // Right wall positions (for photos 9+)
+    const rightWallPositions = [
+      { pos: [5.9, 2.5, -3], rot: [0, -Math.PI / 2, 0] },     // Right wall position 1
+      { pos: [5.9, 2.5, -0.5], rot: [0, -Math.PI / 2, 0] },   // Right wall position 2
+      { pos: [5.9, 2.5, 2], rot: [0, -Math.PI / 2, 0] }       // Right wall position 3
+    ]
+    
+    const colors = [
+      { color: '#ff6b6b', colorAlt: '#ff8e53' },
+      { color: '#4ecdc4', colorAlt: '#45b7d1' },
+      { color: '#96ceb4', colorAlt: '#88d8b0' },
+      { color: '#ffeaa7', colorAlt: '#fdcb6e' },
+      { color: '#dda0dd', colorAlt: '#da70d6' },
+      { color: '#74b9ff', colorAlt: '#a29bfe' },
+      { color: '#fd79a8', colorAlt: '#e17055' },
+      { color: '#55efc4', colorAlt: '#00b894' }
+    ]
+    
+    const photoData = []
+    for (let i = 0; i < totalPhotoCount; i++) {
+      const photoNum = i + 1
+      let position, rotation
+      
+      // Determine which wall to place the photo on
+      if (i < 5) {
+        // Photos 1-5: Back wall
+        position = backWallPositions[i].pos
+        rotation = backWallPositions[i].rot
+      } else if (i < 8) {
+        // Photos 6-8: Left wall
+        const leftIndex = i - 5
+        position = leftWallPositions[leftIndex].pos
+        rotation = leftWallPositions[leftIndex].rot
+      } else {
+        // Photos 9+: Right wall
+        const rightIndex = i - 8
+        position = rightWallPositions[rightIndex].pos
+        rotation = rightWallPositions[rightIndex].rot
+      }
+      
+      // Try different image extensions
+      let imageUrl = null
+      try {
+        // Use dynamic import for Vite asset handling
+        imageUrl = `/src/assets/photo${photoNum}.jpg`
+      } catch (e) {
+        imageUrl = null
+      }
+      
+      photoData.push({
+        position,
+        rotation,
+        caption: `Memory ${photoNum}`,
+        description: `A special moment to remember forever.`,
+        imageUrl,
+        ...colors[i % colors.length]
+      })
+    }
+    
+    return photoData
+  }
 
   const defaultPhotos = [
     { 
-      position: [-2.5, 2, -3], 
-      rotation: [0, 0.2, 0], 
+      position: [-2.5, 2.5, -5.3], 
+      rotation: [0, 0, 0], 
       caption: 'Memory 1',
       description: 'A cherished moment frozen in time.',
+      imageUrl: null,
       color: '#ff6b6b',
       colorAlt: '#ff8e53'
     },
     { 
-      position: [0, 2.3, -4], 
+      position: [-1, 2.5, -5.3], 
       rotation: [0, 0, 0], 
       caption: 'Memory 2',
       description: 'Laughter echoes through this photograph.',
+      imageUrl: null,
       color: '#4ecdc4',
       colorAlt: '#45b7d1'
     },
     { 
-      position: [2.5, 2, -3], 
-      rotation: [0, -0.2, 0], 
+      position: [0.5, 2.5, -5.3], 
+      rotation: [0, 0, 0], 
       caption: 'Memory 3',
       description: 'Adventures that shaped who we are.',
+      imageUrl: null,
       color: '#96ceb4',
       colorAlt: '#88d8b0'
     },
     { 
-      position: [-3.5, 1.8, -2], 
-      rotation: [0, 0.4, 0], 
+      position: [2, 2.5, -5.3], 
+      rotation: [0, 0, 0], 
       caption: 'Memory 4',
       description: 'The journey continues...',
+      imageUrl: null,
       color: '#ffeaa7',
       colorAlt: '#fdcb6e'
     },
     { 
-      position: [3.5, 1.8, -2], 
-      rotation: [0, -0.4, 0], 
+      position: [-1.7, 3.5, -5.3], 
+      rotation: [0, 0, 0], 
       caption: 'Memory 5',
       description: 'Together through thick and thin.',
+      imageUrl: null,
       color: '#dda0dd',
       colorAlt: '#da70d6'
+    },
+    { 
+      position: [-5.9, 2.5, -2], 
+      rotation: [0, Math.PI / 2, 0], 
+      caption: 'Memory 6',
+      description: 'Memories that last a lifetime.',
+      imageUrl: null,
+      color: '#74b9ff',
+      colorAlt: '#a29bfe'
     }
   ]
 
-  const photoData = photos.length > 0 ? photos : defaultPhotos
+  const photoData = generatePhotoData()
 
   const handleZoom = (index) => {
     setZoomedIndex(index)
@@ -248,6 +359,7 @@ function HangingPhotos({ photos = [] }) {
           index={index}
           onZoom={handleZoom}
           isZoomed={zoomedIndex === index}
+          imageUrl={photo.imageUrl}
         />
       ))}
       

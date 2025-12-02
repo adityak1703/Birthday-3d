@@ -1,6 +1,18 @@
 # 🎂 Birthday 3D - Interactive Birthday Wish Website
 
-A cinematic 3D birthday wish website built with React and Three.js. Experience a VR-style birthday celebration in your browser!
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![React](https://img.shields.io/badge/React-19-blue.svg)](https://reactjs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black.svg)](https://threejs.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+A fully customizable, cinematic 3D birthday wish website built with React and Three.js. Create memorable birthday experiences in the browser with interactive 3D elements, animations, and personalized content!
+
+> **Perfect for**: Creating personalized birthday websites for friends, family, or clients. Fully open-source and free to use!
+
+## 🎥 Demo
+
+<!-- Add your demo GIF or video here -->
+🔗 [Live Demo](https://birthday-3d.vercel.app) *(Coming Soon)*
 
 ## ✨ Features
 
@@ -12,13 +24,42 @@ A cinematic 3D birthday wish website built with React and Three.js. Experience a
 - **Party Atmosphere**: Dynamic lighting with colorful party lights
 - **Cinematic Effects**: Depth of field, fog effects, and smooth transitions
 
-## 🚀 Getting Started
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 16+ and npm
 
 ### Installation
 
+1. **Clone the repository**
+```bash
+git clone https://github.com/ak-1344/Birthday-3d.git
+cd Birthday-3d
+```
+
+2. **Install dependencies**
 ```bash
 npm install
 ```
+
+3. **Copy the environment template:**
+```bash
+cp .env.example .env
+```
+
+4. **Edit `.env` file with your personalization:**
+```env
+VITE_PERSON_NAME=John
+VITE_PERSON_AGE=25
+VITE_BIRTHDAY_MESSAGE=Wishing you a day filled with happiness!
+VITE_PHOTO_COUNT=6
+```
+
+5. **Add your photos to `src/assets/`:**
+   - Name them: `photo1.jpg`, `photo2.jpg`, `photo3.jpg`, etc.
+   - See `src/assets/README.md` for detailed instructions
+   - Supported formats: `.jpg`, `.png`, `.webp`
 
 ### Development
 
@@ -76,12 +117,96 @@ src/
 
 ## 🎨 Customization
 
-### Adding Your Own Photos
-Edit the `defaultPhotos` array in `src/components/HangingPhotos.jsx` to add your own memories.
+This is a **fully customizable birthday template**! Personalize every aspect for your special someone.
 
-### Changing Colors
-Modify the color values in each component to match your preferred theme.
+### Quick Customization
+
+Edit the `.env` file to personalize:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `VITE_PERSON_NAME` | Birthday person's name | `Alex` |
+| `VITE_PERSON_AGE` | Person's age (affects candle count) | `25` |
+| `VITE_BIRTHDAY_MESSAGE` | Custom intro message | `Wishing you joy!` |
+| `VITE_PHOTO_COUNT` | Number of photos to display | `6` |
+| `VITE_CAKE_TIERS` | Number of cake tiers (optional) | `3` |
+| `VITE_CANDLE_COUNT` | Override candle count (optional) | Leave empty to use age |
+
+### Adding Custom Photos
+
+1. Place photos in `src/assets/` folder
+2. Name them sequentially: `photo1.jpg`, `photo2.jpg`, `photo3.jpg`, etc.
+3. Set `VITE_PHOTO_COUNT` in `.env` to match the number of photos
+4. Restart dev server to see changes
+
+📖 **Detailed guide**: See [CUSTOMIZATION_GUIDE.md](CUSTOMIZATION_GUIDE.md) for step-by-step instructions, examples, and troubleshooting.
+
+### Advanced Customization
+
+Modify colors, themes, and visual elements in component files:
+- **Cake**: `src/components/Cake.jsx`
+- **Environment**: `src/components/Environment.jsx`
+- **Photos**: `src/components/HangingPhotos.jsx`
+- **Intro**: `src/components/IntroOverlay.jsx`
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ak-1344/Birthday-3d)
+
+1. Click the "Deploy" button above
+2. Configure environment variables in Vercel dashboard
+3. Add your photos to the repository before deployment
+
+### Deploy to Netlify
+
+1. Fork this repository
+2. Connect your fork to Netlify
+3. Set environment variables in Netlify dashboard
+4. Deploy!
+
+### Deploy to GitHub Pages
+
+See our comprehensive [Deployment Guide](DEPLOYMENT.md) for detailed instructions on deploying to GitHub Pages and other platforms.
+
+### Manual Deployment
+
+```bash
+npm run build
+```
+
+The `dist/` folder contains your production-ready site. Upload it to any static hosting service.
+
+📖 **Full deployment instructions**: See [DEPLOYMENT.md](DEPLOYMENT.md) for platform-specific guides (Vercel, Netlify, GitHub Pages, Cloudflare, Firebase, and more).
+
+## 🎨 Customization
+
+## 📝 Roadmap
+
+- [ ] Add more cake themes and designs
+- [ ] Music player integration
+- [ ] Video message support
+- [ ] Multiple language support
+- [ ] Mobile-optimized controls
+- [ ] Custom color themes
+
+## ⭐ Show Your Support
+
+If you like this project, please give it a ⭐ on GitHub!
 
 ## 📄 License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📧 Contact
+
+For questions or suggestions, please open an issue on [GitHub](https://github.com/ak-1344/Birthday-3d/issues).
+
+---
+
+Made with ❤️ by [ak-1344](https://github.com/ak-1344)
